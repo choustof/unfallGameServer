@@ -4,7 +4,7 @@ var Score = {
 
     getAllScore: function(callback) {
 
-        return db.query("Select * from user", callback);
+        return db.query("Select * from user order by score desc", callback);
 
     },
     getScoreByPseudo: function(pseudo, callback) {
