@@ -165,14 +165,23 @@ router.put('/:pseudo/score', function(req, res, next) {
 /*DELETE User (user/{pseudo})*/
 router.delete('/:pseudo',function(req,res,next){
     console.log("Suppression user")
- 
-    User.deleteUser(req.params.pseudo,function(err,count){
- 
-        if(err) {
-          res.json(err);
-        } else {
-          res.json(count);
-         } 
+
+    User.getUserByPseudo(req.params.pseudo, function(err, rows) {
+
+        if (err) {
+            res.json(err);
+        } else if(rows.length<1){
+            res.status(404).json({ "erreur" : "Cet utilisateur n existe pas" });
+        }
+        else{
+            User.deleteUser(req.params.pseudo,function(err,count){
+                if(err) {
+                    res.json(err);
+                } else {
+                    res.json(count);
+                } 
+            });
+        }
     });
  });
 

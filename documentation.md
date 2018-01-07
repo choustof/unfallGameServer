@@ -208,6 +208,7 @@
     **Content:** 
     false
 
+
 **Modifier un utilisateur**
 ----
   Modifier les informations d'un utilisateur
@@ -255,6 +256,7 @@
       "erreur" : "Cet utilisateur n existe pas" 
     }
 
+
 **Modifier le score d'un utilisateur**
 ----
   Modifier le score d'un utilisateur
@@ -265,6 +267,54 @@
 * **Method:**
 
   `PUT`
+  
+*  **URL Params**
+
+  **Required:**
+  `pseudo=[varchar]`
+
+* **Data Params**
+
+ **Not Required:**
+ 
+   `score=[integer]`
+   Si le score n'est pas renseigné, on le met à 0 par défaut.
+
+
+* **Success Response:**
+
+  * **Code:** 200 Ok<br />
+    **Content:** 
+    {
+    "fieldCount": 0,
+    "affectedRows": 1,
+    "insertId": 0,
+    "serverStatus": 34,
+    "warningCount": 0,
+    "message": "(Rows matched: 1  Changed: 1  Warnings: 0",
+    "protocol41": true,
+    "changedRows": 1
+}
+ 
+* **Error Response:**
+
+  * **Code:** 404 Not Found <br />
+    **Content:** 
+    { 
+      "erreur" : "Cet utilisateur n existe pas" 
+    }
+
+
+**Supprimer un utilisateur**
+----
+  Supprimer un utilsateur
+* **URL**
+
+  /user/:pseudo
+
+* **Method:**
+
+  `DELETE`
   
 *  **URL Params**
 
