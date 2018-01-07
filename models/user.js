@@ -25,7 +25,7 @@ var User = {
     },
     updateUser: function(pseudo,user, callback) {
 
-        return db.query("update user set pseudo=?, score=? where pseudo=?", [user.pseudo, user.score, pseudo], callback);
+        return db.query("update user set pseudo=?, score=? where pseudo=?", [pseudo, user.score, pseudo], callback);
     },
     deleteUser: function(pseudo, callback) {
 

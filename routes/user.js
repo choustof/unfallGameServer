@@ -15,7 +15,7 @@ router.get('/:pseudo?', function(req, res, next) {
             if (err) {
                 res.json(err);
             } else if(rows.length<1){
-                res.status(404).json("{ erreur : 'Cet utilisateur n existe pas' }");
+                res.status(404).json({ "erreur" : "Cet utilisateur n existe pas" });
             }
             else{
                 res.json(rows);
@@ -27,26 +27,15 @@ router.get('/:pseudo?', function(req, res, next) {
 
             if (err) {
                 res.json(err);
-            } else {
+            } else if(rows.length<1){
+                res.status(200).json({ "warning" : "Aucun utilisateur connecté" });
+            }
+            else{
                 res.json(rows);
             }
 
         });
     }
-});
-
-/*GET User (user/{pseudo}/score)*/
-router.get('/:pseudo/score', function(req, res, next) {
-    console.log('Get user score')
-
-    User.getUserScoreByPseudo(req.params.pseudo, function(err, rows) {
-
-        if (err) {
-            res.json(err);
-        } else {
-            res.json(rows);
-        }
-    });
 });
 
 /*GET User (user/classement/top10)
@@ -58,11 +47,30 @@ router.get('/classement/top10', function(req, res, next) {
 
             if (err) {
                 res.json(err);
-            } else {
+            } else if(rows.length<1){
+                res.status(200).json({ "warning" : "Aucun utilisateur connecté" });
+            }
+            else{
                 res.json(rows);
             }
-
         });
+});
+
+/*GET User (user/{pseudo}/score)*/
+router.get('/:pseudo/score', function(req, res, next) {
+    console.log('Get user score')
+
+    User.getUserScoreByPseudo(req.params.pseudo, function(err, rows) {
+
+        if (err) {
+            res.json(err);
+        } else if(rows.length<1){
+                res.status(404).json({ "erreur" : "Cet utilisateur n existe pas" });
+            }
+            else{
+                res.json(rows);
+            }
+    });
 });
 
 /*POST User (user)*/
@@ -81,7 +89,7 @@ router.post('/', function(req, res, next) {
             } else if(rows.length>0) {
                 //   Le pseudo est déjà utilisé
                 console.log("ce pseudo est deja utilisé")
-                res.json(false);
+                res.status(409).json(false);
             }else{
                 //   Le pseudo est libre, on peut créerle mini compte
                 console.log("ce pseudo est disponible good")
@@ -104,15 +112,27 @@ router.post('/', function(req, res, next) {
 router.put('/:pseudo', function(req, res, next) {
     console.log('Modification user')
 
-    User.updateUser(req.params.pseudo, req.body, function(err, rows) {
+    User.getUserByPseudo(req.params.pseudo, function(err, rows) {
 
         if (err) {
             res.json(err);
-        } else {
-            res.json(rows);
+        } else if(rows.length<1){
+            res.status(404).json({ "erreur" : "Cet utilisateur n existe pas" });
+        }
+        else{
+            User.updateUser(req.params.pseudo, req.body, function(err, rows) {
+
+                if (err) {
+                    res.json(err);
+                } else {
+                    res.json(rows);
+                    console.log("PAS DERREUR");
+                }
+            });
+
         }
     });
-});
+}); 
 
 /*PUT User (user/{pseudo}/score)*/
 router.put('/:pseudo/score', function(req, res, next) {
@@ -120,12 +140,24 @@ router.put('/:pseudo/score', function(req, res, next) {
 
     req.body.pseudo = req.params.pseudo;
 
-    User.updateUser(req.params.pseudo, req.body, function(err, rows) {
+    User.getUserByPseudo(req.params.pseudo, function(err, rows) {
 
         if (err) {
             res.json(err);
-        } else {
-            res.json(rows);
+        } else if(rows.length<1){
+            res.status(404).json({ "erreur" : "Cet utilisateur n existe pas" });
+        }
+        else{
+            User.updateUser(req.params.pseudo, req.body, function(err, rows) {
+
+                if (err) {
+                    res.json(err);
+                } else {
+                    res.json(rows);
+                    console.log(req.body.score);
+                }
+            });
+
         }
     });
 });
