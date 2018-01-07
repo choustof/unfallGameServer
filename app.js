@@ -3,6 +3,7 @@ var express = require('express');
 var app = express();
 var server = http.createServer(app);
 var bodyParser = require('body-parser');
+var cors = require('cors');
 
 // Chargement de socket.io
 var io = require('socket.io').listen(server);
@@ -15,7 +16,7 @@ var fs = require("fs");
 var Score = require('./routes/score');
 var Pseudo = require('./routes/pseudo');
 
-
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
@@ -72,11 +73,11 @@ io.sockets.on('connection', function(socket, pseudo) {
 
 
 
-var currentPlayer = {};
+    var currentPlayer = {};
 	currentPlayer.pseudo = 'unknown';
 
 	socket.on('player connect', function() {
-		console.log(currentPlayer.pseudo+' recv: player connect');
+		console.log(currentPlayer.pseudo+'  player connect');
 		for(var i =0; i<clients.length;i++) {
 			var playerConnected = {
 				pseudo:clients[i].pseudo,
@@ -86,12 +87,12 @@ var currentPlayer = {};
 			};
 			// in your current game, we need to tell you about the other players.
 			socket.emit('other player connected', playerConnected);
-			console.log(currentPlayer.pseudo+' emit: other player connected: '+JSON.stringify(playerConnected));
+			console.log(currentPlayer.pseudo+'  other players connected: '+JSON.stringify(playerConnected.pseudo));
 		}
 	});
 
 	socket.on('play', function(data) {
-		console.log(currentPlayer.pseudo+' recv: play: '+JSON.stringify(data));
+		
 		
 		// we always will send the enemies when the player joins
 		currentPlayer = {
@@ -101,22 +102,41 @@ var currentPlayer = {};
 			score: data.score
 		};
 		clients.push(currentPlayer);
+        console.log(currentPlayer.pseudo+'  play: '+JSON.stringify(data));
 		// in your current game, tell you that you have joined
 		
 		//socket.emit('play', currentPlayer);
 		// in your current game, we need to tell the other players about you.
-		console.log(currentPlayer.pseudo+' emit: other player connected: ');
-		console.log(currentPlayer);
+		console.log(' tell other players connected that : '+currentPlayer.pseudo+' is connected');
 		socket.broadcast.emit('other player connected', currentPlayer);
 	});
 
 
 
 
+    socket.on('player move', function(data) {
+        console.log(' move: '+currentPlayer.pseudo);
+        currentPlayer.position = data.position;
+        socket.broadcast.emit('player move', currentPlayer);
+    });
+
 
 
     socket.on('disconnect', function() {
-        console.log('socket disconnected: ' + socket.id);
+        console.log(currentPlayer.pseudo+' has disconnect '+currentPlayer.pseudo);
+        socket.broadcast.emit('other player disconnected', currentPlayer);
+        socket.emit('disconnect1', currentPlayer);
+        console.log(' tell other players that '+currentPlayer.pseudo+' has disconnected ');
+        for(var i=0; i<clients.length; i++) {
+            if(clients[i].pseudo === currentPlayer.pseudo) {
+                clients.splice(i,1);
+            }
+        }
+
+        for(var i =0; i<clients.length;i++) {
+            console.log(clients[i].pseudo+'  is still connected: ');
+        }
+        console.log(clients);
     });
 
     socket.on('test-event1', function() {
