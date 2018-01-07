@@ -78,7 +78,9 @@ router.post('/', function(req, res, next) {
 
     console.log('Ajout user')
 
-    req.body.score = '0';
+    if(!req.body.score){
+        req.body.score= '0';
+    } 
 
 // On test si le pseudo est déjà utilisé
      User.getUserByPseudo(req.body.pseudo, function(err, rows) {

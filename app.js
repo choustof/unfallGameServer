@@ -12,8 +12,6 @@ var port = process.env.PORT || 3000;
 var fs = require("fs");
 
 // Chargement des routes
-var Score = require('./routes/score');
-var Pseudo = require('./routes/pseudo');
 var User = require('./routes/user')
 
 
@@ -37,8 +35,6 @@ connection.getConnection(function(err, connection) {
 
 
 // utilisation des routes
-app.use('/score', Score);
-app.use('/pseudo', Pseudo);
 app.use('/user', User);
 
 //premiere route
@@ -46,7 +42,6 @@ app.get('/', function(req, res) {
     res.send('Unfall REST API');
     console.log("Unfall REST API")
 });
-
 
 
 app.get('/listScores', function(req, res) {
@@ -63,9 +58,6 @@ io.sockets.on('connection', function(socket, pseudo) {
 
 
     console.log('socket connected: ' + socket.id);
-
-
-
 
 
 var currentPlayer = {};
@@ -105,10 +97,6 @@ var currentPlayer = {};
 		console.log(currentPlayer);
 		socket.broadcast.emit('other player connected', currentPlayer);
 	});
-
-
-
-
 
 
     socket.on('disconnect', function() {
