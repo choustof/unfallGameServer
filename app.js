@@ -13,8 +13,7 @@ var port = process.env.PORT || 3000;
 var fs = require("fs");
 
 // Chargement des routes
-var Score = require('./routes/score');
-var Pseudo = require('./routes/pseudo');
+var User = require('./routes/user')
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -37,22 +36,14 @@ connection.getConnection(function(err, connection) {
 
 
 // utilisation des routes
-app.use('/score', Score);
-app.use('/pseudo', Pseudo);
+app.use('/user', User);
 
-//first route default
+//premiere route
 app.get('/', function(req, res) {
-    res.send('send back');
-    console.log(" first route")
+    res.send('Unfall REST API');
+    console.log("Unfall REST API")
 });
 
-
-// route test
-/*app.post('/user/pseudo', function (req, res) { 
-    res.send('thank you');
-    console.log(req.body)
-    console.log("mon premier post")
-});*/
 
 app.get('/listScores', function(req, res) {
     fs.readFile(__dirname + "/" + "scores.json", 'utf8', function(err, data) {
@@ -71,9 +62,8 @@ io.sockets.on('connection', function(socket, pseudo) {
 
 
 
-
-
     var currentPlayer = {};
+
 	currentPlayer.pseudo = 'unknown';
 
 	socket.on('player connect', function() {
@@ -110,7 +100,6 @@ io.sockets.on('connection', function(socket, pseudo) {
 		console.log(' tell other players connected that : '+currentPlayer.pseudo+' is connected');
 		socket.broadcast.emit('other player connected', currentPlayer);
 	});
-
 
 
 
