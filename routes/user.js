@@ -14,7 +14,10 @@ router.get('/:pseudo?', function(req, res, next) {
 
             if (err) {
                 res.json(err);
-            } else {
+            } else if(rows.length<1){
+                res.status(404).json("{ erreur : 'Cet utilisateur n existe pas' }");
+            }
+            else{
                 res.json(rows);
             }
         });
@@ -62,7 +65,7 @@ router.get('/classement/top10', function(req, res, next) {
         });
 });
 
-/*POST User (/user)*/
+/*POST User (user)*/
 router.post('/', function(req, res, next) {
 
     console.log('Ajout user')
