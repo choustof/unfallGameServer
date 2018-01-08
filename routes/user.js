@@ -18,7 +18,7 @@ router.get('/:pseudo?', function(req, res, next) {
                 res.status(404).json({ "erreur" : "Cet utilisateur n existe pas" });
             }
             else{
-                res.json(rows);
+                res.json(rows[0]);
             }
         });
     } else {
@@ -91,7 +91,7 @@ router.post('/', function(req, res, next) {
             } else if(rows.length>0) {
                 //   Le pseudo est déjà utilisé
                 console.log("ce pseudo est deja utilisé")
-                res.status(409).json(false);
+                res.status(409).json({ "erreur" : "Ce pseudo est deja pris" });
             }else{
                 //   Le pseudo est libre, on peut créerle mini compte
                 console.log("ce pseudo est disponible good")

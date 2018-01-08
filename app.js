@@ -89,7 +89,8 @@ io.sockets.on('connection', function(socket, pseudo) {
 			pseudo:  data.pseudo,
 			position: data.position,
 			rotation: data.rotation,
-			score: data.score
+			score: data.score,
+            socketId:socket.id
 		};
 		clients.push(currentPlayer);
         console.log(currentPlayer.pseudo+'  play: '+JSON.stringify(data));
@@ -108,6 +109,37 @@ io.sockets.on('connection', function(socket, pseudo) {
         currentPlayer.position = data.position;
         socket.broadcast.emit('player move', currentPlayer);
     });
+
+
+
+    socket.on('player turn', function(data) {
+        console.log('turn: '+currentPlayer.pseudo);
+        currentPlayer.rotation = data.rotation;
+        socket.broadcast.emit('player turn', currentPlayer);
+    });
+
+
+
+
+    socket.on('player shoot', function(data) { 
+        console.log(currentPlayer.pseudo+'  shoot'); 
+        var data = {
+            pseudo: currentPlayer.pseudo,
+            position : data.position
+        };
+        //socket.emit('player shoot', data);
+        socket.broadcast.emit('player shoot', data);
+    });
+
+
+
+    socket.on('player hit', function(data) {
+        console.log(currentPlayer.pseudo+' shoot '+data.pseudo);
+        socket.broadcast.emit('touch',data);
+        
+    });
+
+   
 
 
 
@@ -132,15 +164,6 @@ io.sockets.on('connection', function(socket, pseudo) {
         console.log('got test-event1');
     });
 
-    socket.on('test-event2', function(data) {
-        console.log('got test-event2');
-        console.log(data);
-
-        socket.emit('test-event', {
-            test: 12345,
-            test2: 'test emit event'
-        });
-    });
 
     socket.on('test-event3', function(data, callback) {
         console.log('got test-event3');
