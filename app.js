@@ -41,8 +41,8 @@ app.use('/user', User);
 
 //premiere route
 app.get('/', function(req, res) {
-    res.send('Unfall REST API');
-    console.log("Unfall REST API")
+    res.send('Unfall REST API 2');
+    console.log("Unfall REST API 2")
 });
 
 
