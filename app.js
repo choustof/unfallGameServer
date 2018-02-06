@@ -133,7 +133,7 @@ io.sockets.on('connection', function(socket, pseudo) {
 
 
     socket.on('player shoot', function(data) { 
-        console.log(currentPlayer.pseudo+'  shoot'); 
+        //console.log(currentPlayer.pseudo+'  shoot'); 
         var data = {
             pseudo: currentPlayer.pseudo,
             position : data.position
