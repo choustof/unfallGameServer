@@ -1,4 +1,4 @@
-var express = require('express');
+ var express = require('express');
 var router = express.Router({mergeParams: true});
 var User = require('../models/user');
 
@@ -102,8 +102,8 @@ router.post('/', function(req, res, next) {
 
     console.log('Ajout user')
 
-    if(!req.body.score){
-        req.body.score= '0';
+    if(!req.body.Hscore){
+        req.body.Hscore= '0';
     } 
 
 // On test si le pseudo est déjà utilisé
