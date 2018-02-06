@@ -3,6 +3,7 @@ var express = require('express');
 var app = express();
 var server = http.createServer(app);
 var bodyParser = require('body-parser');
+var methodOverride = require('method-override')
 var cors = require('cors');
 
 // Chargement de socket.io
@@ -17,15 +18,15 @@ var User = require('./routes/user')
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(methodOverride('_method'));
 
 //test connexion to database
 var connection = require('./Database/database_model');
 
 connection.getConnection(function(err, connection) {
     if (err) {
+        console.log(err);
         throw err;
     } else {
         console.log('connected to the database')
@@ -73,12 +74,14 @@ io.sockets.on('connection', function(socket, pseudo) {
 				pseudo:clients[i].pseudo,
 				position:clients[i].position,
 				rotation:clients[i].position,
-				health:clients[i].health
+                currentScore:clients[i].currentScore,
+                Hscore:clients[i].Hscore
 			};
 			// in your current game, we need to tell you about the other players.
 			socket.emit('other player connected', playerConnected);
 			console.log(currentPlayer.pseudo+'  other players connected: '+JSON.stringify(playerConnected.pseudo));
-		}
+
+    		}
 	});
 
 	socket.on('play', function(data) {
@@ -89,7 +92,8 @@ io.sockets.on('connection', function(socket, pseudo) {
 			pseudo:  data.pseudo,
 			position: data.position,
 			rotation: data.rotation,
-			score: data.score,
+            currentScore: data.currentScore,
+			Hscore: data.Hscore,
             socketId:socket.id
 		};
 		clients.push(currentPlayer);
@@ -100,12 +104,19 @@ io.sockets.on('connection', function(socket, pseudo) {
 		// in your current game, we need to tell the other players about you.
 		console.log(' tell other players connected that : '+currentPlayer.pseudo+' is connected');
 		socket.broadcast.emit('other player connected', currentPlayer);
+
+
+
+        for(var i =0; i<clients.length;i++) {            
+            // in your current game, we need to tell you about the other players scores.    
+            socket.emit('updateScore',{pseudo:clients[i].pseudo,score:clients[i].currentScore});
+        }
 	});
 
 
 
     socket.on('player move', function(data) {
-        console.log(' move: '+currentPlayer.pseudo);
+        //console.log(' move: '+currentPlayer.pseudo);
         currentPlayer.position = data.position;
         socket.broadcast.emit('player move', currentPlayer);
     });
@@ -113,7 +124,7 @@ io.sockets.on('connection', function(socket, pseudo) {
 
 
     socket.on('player turn', function(data) {
-        console.log('turn: '+currentPlayer.pseudo);
+        //console.log('turn: '+currentPlayer.pseudo);
         currentPlayer.rotation = data.rotation;
         socket.broadcast.emit('player turn', currentPlayer);
     });
@@ -134,9 +145,25 @@ io.sockets.on('connection', function(socket, pseudo) {
 
 
     socket.on('player hit', function(data) {
-        console.log(currentPlayer.pseudo+' shoot '+data.pseudo);
+        console.log(currentPlayer.pseudo+' hit '+data.pseudo);
         socket.broadcast.emit('touch',data);
         
+    });
+
+    socket.on('updateHighScore', function(data) {
+        console.log(currentPlayer.pseudo+' get new highSCORE : '+data.Hscore);
+        currentPlayer.Hscore = data.Hscore;
+        io.emit('updateHighScore',currentPlayer);
+       
+    });
+
+    socket.on('updateScore', function(data) {
+        console.log(currentPlayer.pseudo+' get new score : '+data.currentScore);
+
+        currentPlayer.currentScore = data.currentScore;
+
+        io.emit('updateScore',{pseudo:data.pseudo,score:data.currentScore});
+       
     });
 
    

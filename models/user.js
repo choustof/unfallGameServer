@@ -21,11 +21,15 @@ var User = {
     },
     addUser: function(user, callback) {
 
-        return db.query("Insert into user values(?,?,?)", [null, user.pseudo, user.score], callback);
+        return db.query("Insert into user values(?,?,?)", [null, user.pseudo, user.Hscore], callback);
     },
     updateUser: function(pseudo,user, callback) {
 
-        return db.query("update user set pseudo=?, score=? where pseudo=?", [pseudo, user.score, pseudo], callback);
+        return db.query("update user set pseudo=?, score=? where pseudo=?", [pseudo, user.Hscore, pseudo], callback);
+    },
+    updateScoreByUser: function(user, callback) {
+
+        return db.query("update user set score=? where pseudo=?", [user.Hscore, user.pseudo], callback);
     },
     deleteUser: function(pseudo, callback) {
 

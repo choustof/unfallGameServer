@@ -1,5 +1,5 @@
 var express = require('express');
-var router = express.Router();
+var router = express.Router({mergeParams: true});
 var User = require('../models/user');
 
 
@@ -59,6 +59,7 @@ router.get('/classement/top10', function(req, res, next) {
 /*GET User (user/{pseudo}/score)*/
 router.get('/:pseudo/score', function(req, res, next) {
     console.log('Get user score')
+    console.log(req.params)
 
     User.getUserScoreByPseudo(req.params.pseudo, function(err, rows) {
 
@@ -72,6 +73,29 @@ router.get('/:pseudo/score', function(req, res, next) {
             }
     });
 });
+
+
+/*PUT User Score (user/{pseudo}/score/{score})*/
+router.put('/score', function(req, res, next) {
+    console.log('Modification user score /score')
+
+    //console.log(err)
+    console.log(req.body)
+   
+
+    //var user;
+    User.updateScoreByUser(req.body, function(err, rows) {
+
+        if (err) {
+            res.json(err);
+            console.log("erreur");
+        } else {
+            res.json(rows);
+        }
+    });
+});
+
+
 
 /*POST User (user)*/
 router.post('/', function(req, res, next) {
@@ -110,62 +134,13 @@ router.post('/', function(req, res, next) {
 
 });
 
-/*PUT User (user/{pseudo})*/
-router.put('/:pseudo', function(req, res, next) {
-    console.log('Modification user')
 
-    User.getUserByPseudo(req.params.pseudo, function(err, rows) {
 
-        if (err) {
-            res.json(err);
-        } else if(rows.length<1){
-            res.status(404).json({ "erreur" : "Cet utilisateur n existe pas" });
-        }
-        else{
-            User.updateUser(req.params.pseudo, req.body, function(err, rows) {
 
-                if (err) {
-                    res.json(err);
-                } else {
-                    res.json(rows);
-                    console.log("PAS DERREUR");
-                }
-            });
 
-        }
-    });
-}); 
-
-/*PUT User (user/{pseudo}/score)*/
-router.put('/:pseudo/score', function(req, res, next) {
-    console.log('Modification user score')
-
-    req.body.pseudo = req.params.pseudo;
-
-    User.getUserByPseudo(req.params.pseudo, function(err, rows) {
-
-        if (err) {
-            res.json(err);
-        } else if(rows.length<1){
-            res.status(404).json({ "erreur" : "Cet utilisateur n existe pas" });
-        }
-        else{
-            User.updateUser(req.params.pseudo, req.body, function(err, rows) {
-
-                if (err) {
-                    res.json(err);
-                } else {
-                    res.json(rows);
-                    console.log(req.body.score);
-                }
-            });
-
-        }
-    });
-});
 
 /*DELETE User (user/{pseudo})*/
-router.delete('/:pseudo',function(req,res,next){
+router.delete('/:pseudo?',function(req,res,next){
     console.log("Suppression user")
 
     User.getUserByPseudo(req.params.pseudo, function(err, rows) {
